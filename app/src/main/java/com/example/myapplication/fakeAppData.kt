@@ -39,6 +39,7 @@ object FakeAppData {
             category = "Инструменты",
             iconRes = R.drawable.outline_4g_mobiledata_badge_24
         ),
+
         AppItem(
             id = "yandex_search",
             title = "Яндекс — с Алисой",
