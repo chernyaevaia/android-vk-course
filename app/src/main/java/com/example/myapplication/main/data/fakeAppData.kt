@@ -1,5 +1,6 @@
-package com.example.myapplication
+package com.example.myapplication.main.data
 
+import com.example.myapplication.AppItem
 import com.example.myapplication.R
 
 object FakeAppData {
@@ -39,7 +40,6 @@ object FakeAppData {
             category = "Инструменты",
             iconRes = R.drawable.outline_4g_mobiledata_badge_24
         ),
-
         AppItem(
             id = "yandex_search",
             title = "Яндекс — с Алисой",
