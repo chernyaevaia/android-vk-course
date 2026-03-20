@@ -21,7 +21,15 @@ fun AppDetailsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val underDevText = stringResource(R.string.under_developement)
 
-
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is AppDetailsEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
     Scaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) }
