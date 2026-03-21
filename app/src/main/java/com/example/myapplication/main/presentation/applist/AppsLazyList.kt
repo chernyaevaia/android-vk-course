@@ -1,4 +1,4 @@
-package com.example.myapplication.applist
+package com.example.myapplication.main.presentation.applist
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.AppItem
+import com.example.myapplication.main.domain.AppItem
 
 @Composable
 fun AppsLazyList(

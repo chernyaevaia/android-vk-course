@@ -1,7 +1,7 @@
 package com.example.myapplication.main.data
 
-import com.example.myapplication.Category
-import com.example.myapplication.main.presentation.appdetails.AppDetails
+import com.example.myapplication.main.domain.Category
+import com.example.myapplication.main.domain.AppDetails
 
 object FakeAppDetailsData {
 
