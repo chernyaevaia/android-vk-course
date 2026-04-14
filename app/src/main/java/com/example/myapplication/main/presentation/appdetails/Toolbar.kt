@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.main.presentation.appdetails
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

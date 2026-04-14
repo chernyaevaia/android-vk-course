@@ -6,6 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.main.presentation.applist.AppsListScreen
+import com.example.myapplication.main.presentation.appdetails.AppDetailsScreen
 
 object NavRoutes {
     const val LIST = "list"
@@ -23,7 +25,6 @@ fun AppNavGraph(modifier: Modifier = Modifier) {
     ) {
         composable(route = NavRoutes.LIST) {
             AppsListScreen(
-                itemsList = FakeAppData.apps,
                 onItemClick = { _ -> navController.navigate(NavRoutes.DETAILS) }
             )
         }

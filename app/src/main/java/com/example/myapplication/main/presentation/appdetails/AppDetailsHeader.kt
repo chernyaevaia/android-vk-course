@@ -1,5 +1,6 @@
-package com.example.myapplication
+package com.example.myapplication.main.presentation.appdetails
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -21,11 +22,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.myapplication.main.domain.AppDetails
+import com.example.myapplication.main.domain.Category
 import kotlin.math.roundToInt
 
 @Composable
 fun AppDetailsHeader(
     appDetails: AppDetails,
+    onLogoClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -38,9 +42,12 @@ fun AppDetailsHeader(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(128.dp)
-                .clip(RoundedCornerShape(16.dp)),
+                .clip(RoundedCornerShape(16.dp))
+                .clickable(onClick = onLogoClick),
         )
+
         Spacer(Modifier.width(16.dp))
+
         Column {
             Text(
                 text = getCategoryText(appDetails.category),
