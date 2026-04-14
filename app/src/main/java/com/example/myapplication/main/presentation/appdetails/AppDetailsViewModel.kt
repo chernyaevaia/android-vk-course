@@ -1,6 +1,7 @@
 package com.example.myapplication.main.presentation.appdetails
 
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.main.data.FakeAppDetailsData
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

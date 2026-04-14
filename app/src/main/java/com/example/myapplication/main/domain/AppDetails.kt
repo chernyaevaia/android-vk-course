@@ -1,6 +1,4 @@
-package com.example.myapplication.main.presentation.appdetails
-
-import com.example.myapplication.Category
+package com.example.myapplication.main.domain
 
 data class AppDetails(
     val name: String,

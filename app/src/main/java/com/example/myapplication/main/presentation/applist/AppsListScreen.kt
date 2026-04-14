@@ -1,4 +1,4 @@
-package com.example.myapplication.applist
+package com.example.myapplication.main.presentation.applist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,8 +22,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.AppItem
 import com.example.myapplication.R
+import com.example.myapplication.main.domain.AppItem
 
 @Composable
 fun AppsListScreen(

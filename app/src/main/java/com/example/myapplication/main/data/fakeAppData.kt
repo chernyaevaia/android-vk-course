@@ -1,5 +1,6 @@
-package com.example.myapplication
+package com.example.myapplication.main.data
 
+import com.example.myapplication.AppItem
 import com.example.myapplication.R
 
 object FakeAppData {
