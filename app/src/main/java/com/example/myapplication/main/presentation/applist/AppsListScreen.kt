@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.main.domain.AppItem
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
@@ -30,7 +30,7 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 fun AppsListScreen(
     onItemClick: (AppItem) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AppsListViewModel = viewModel(),
+    viewModel: AppsListViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
     val localContext = LocalContext.current

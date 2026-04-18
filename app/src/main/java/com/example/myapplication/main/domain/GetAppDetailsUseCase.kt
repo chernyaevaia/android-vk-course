@@ -1,10 +1,12 @@
 package com.example.myapplication.main.domain
 
-class GetAppDetailsUseCase(
+import javax.inject.Inject
+
+class GetAppDetailsUseCase @Inject constructor(
     private val appDetailsRepository: AppDetailsRepository,
 ) {
     suspend operator fun invoke(): AppDetails {
-        val app: AppDetails = appDetailsRepository.get()
+        val app = appDetailsRepository.get()
 
         if (app.category == Category.GAME) {
             throw IllegalStateException()
