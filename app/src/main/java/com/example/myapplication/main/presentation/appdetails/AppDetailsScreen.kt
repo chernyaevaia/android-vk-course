@@ -23,14 +23,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
-
+import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun AppDetailsScreen(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    viewModel: AppDetailsViewModel = viewModel(),
+    viewModel: AppDetailsViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
     val localContext = LocalContext.current
