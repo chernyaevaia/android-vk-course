@@ -1,8 +1,9 @@
 package com.example.myapplication.main.data
 
 import com.example.myapplication.main.data.applist.dto.AppItemDto
+import javax.inject.Inject
 
-class AppsListApi {
+class AppsListApi @Inject constructor() {
     fun getApps(): List<AppItemDto> =
         FakeAppData.apps.map {
             AppItemDto(
