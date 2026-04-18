@@ -1,18 +1,19 @@
 package com.example.myapplication.main.data
 
 import com.example.myapplication.main.domain.AppDetails
+import com.example.myapplication.main.domain.Category
 import javax.inject.Inject
 
 class AppDetailsMapper @Inject constructor() {
 
     fun toDomain(dto: AppDetailsDto): AppDetails = AppDetails(
-        name = dto.name,
-        developer = dto.developer,
-        category = dto.category,
-        ageRating = dto.ageRating,
-        size = dto.size.toFloat(),
-        iconUrl = dto.icon,
-        screenshotUrlList = dto.screenshots,
-        description = dto.description,
+        name = dto.name ?: "",
+        developer = "Unknown",
+        category = Category.APP,
+        ageRating = 0,
+        size = 0f,
+        iconUrl = dto.iconUrl ?: "",
+        screenshotUrlList = emptyList(),
+        description = dto.description ?: ""
     )
 }
