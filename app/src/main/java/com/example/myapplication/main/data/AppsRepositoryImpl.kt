@@ -5,10 +5,15 @@ import com.example.myapplication.main.domain.AppsRepository
 import javax.inject.Inject
 
 class AppsRepositoryImpl @Inject constructor(
-    private val api: AppsListApi,
+    private val api: AppsApi,
     private val mapper: AppItemDtoMapper,
 ) : AppsRepository {
+
     override suspend fun getApps(): List<AppItem> {
-        return api.getApps().map(mapper::map)
+        val dtoList = api.getApps()
+
+        return dtoList.map { dto ->
+            mapper.map(dto)
+        }
     }
 }
