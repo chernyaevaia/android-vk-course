@@ -1,9 +1,9 @@
-package com.example.myapplication.main.data.applist.dto
+package com.example.myapplication.main.data
 
 data class AppItemDto(
-    val id: String,
-    val title: String,
-    val subtitle: String,
-    val category: String,
-    val iconRes: Int,
+    val id: String?,
+    val name: String?,
+    val description: String?,
+    val category: String?,
+    val iconUrl: String?,
 )

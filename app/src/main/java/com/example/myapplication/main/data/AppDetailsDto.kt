@@ -1,15 +1,9 @@
 package com.example.myapplication.main.data
 
-import com.example.myapplication.main.domain.Category
-
-
 data class AppDetailsDto(
-    val name: String,
-    val developer: String,
-    val category: Category,
-    val ageRating: Int,
-    val size: Double,
-    val icon: String,
-    val screenshots: List<String>,
-    val description: String,
+    val id: String?,
+    val name: String?,
+    val description: String?,
+    val category: String?,
+    val iconUrl: String?
 )
