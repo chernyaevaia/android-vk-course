@@ -2,6 +2,7 @@ package com.example.myapplication.main.presentation.applist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.R
 import com.example.myapplication.main.data.AppItemDtoMapper
 import com.example.myapplication.main.data.AppsListApi
 import com.example.myapplication.main.data.AppsRepositoryImpl
@@ -33,7 +34,7 @@ class AppsListViewModel : ViewModel() {
         }
     }
 
-    fun onLogoClick(message: String) {
-        _events.trySend(AppsListEvent.ShowSnackbar(message))
+    fun onLogoClick() {
+        _events.trySend(AppsListEvent.ShowSnackbar(R.string.app_name))
     }
 }

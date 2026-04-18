@@ -1,7 +1,5 @@
 package com.example.myapplication.main.domain
 
-import kotlin.text.get
-
 class GetAppDetailsUseCase(
     private val appDetailsRepository: AppDetailsRepository,
 ) {

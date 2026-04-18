@@ -4,14 +4,12 @@ import AppDetailsMapper
 import com.example.myapplication.main.domain.AppDetails
 import com.example.myapplication.main.domain.AppDetailsRepository
 
-
-class AppDetailsRepositorImpl : AppDetailsRepository {
-    private val appApi = AppDetailsApi()
-    private val mapper = AppDetailsMapper()
+class AppDetailsRepositoryImpl(
+    private val appApi: AppDetailsApi,
+    private val mapper: AppDetailsMapper,
+) : AppDetailsRepository {
 
     override suspend fun get(): AppDetails {
-        val dto = appApi.get()
-        val domain = mapper.toDomain(dto)
-        return domain
+        return mapper.toDomain(appApi.get())
     }
 }

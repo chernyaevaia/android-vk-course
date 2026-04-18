@@ -1,0 +1,457 @@
+Index: app/src/main/res/values/strings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><resources>\n    <string name=\"app_name\">My app</string>\n\n    <string name=\"category_app\">Приложения</string>\n    <string name=\"category_game\">Игры</string>\n\n    <string name=\"app_details_age\">Возраст</string>\n    <string name=\"app_details_size\">Размер</string>\n\n    <string name=\"install\">Установить</string>\n\n    <string name=\"app_details_screenshots\">Скриншоты</string>\n\n    <string name=\"app_details_description\">Описание приложения</string>\n    <string name=\"app_details_read_more\">Читать подробнее</string>\n\n    <string name=\"app_details_developer\">Разработчик</string>\n\n    <string name=\"under_developement\">В процессе разработки</string>\n</resources>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/values/strings.xml b/app/src/main/res/values/strings.xml
+--- a/app/src/main/res/values/strings.xml	(revision e09754006436285abb160b2bf825c156c729ab9a)
++++ b/app/src/main/res/values/strings.xml	(date 1776177623521)
+@@ -17,4 +17,7 @@
+     <string name="app_details_developer">Разработчик</string>
+ 
+     <string name="under_developement">В процессе разработки</string>
++    <string name="no_app_details">Приложение не найдено</string>
++    <string name="load_error">Ошибка при загрузке</string>
++
+ </resources>
+\ No newline at end of file
+Index: app/src/main/java/com/example/myapplication/main/data/AppDetailsRepositoryImpl.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication.main.data\n\nimport AppDetailsMapper\nimport com.example.myapplication.main.domain.AppDetails\nimport com.example.myapplication.main.domain.AppDetailsRepository\n\n\nclass AppDetailsRepositorImpl : AppDetailsRepository {\n    private val appApi = AppDetailsApi()\n    private val mapper = AppDetailsMapper()\n\n    override suspend fun get(): AppDetails {\n        val dto = appApi.get()\n        val domain = mapper.toDomain(dto)\n        return domain\n    }\n}
+===================================================================
+diff --git a/app/src/main/java/com/example/myapplication/main/data/AppDetailsRepositoryImpl.kt b/app/src/main/java/com/example/myapplication/main/data/AppDetailsRepositoryImpl.kt
+--- a/app/src/main/java/com/example/myapplication/main/data/AppDetailsRepositoryImpl.kt	(revision e09754006436285abb160b2bf825c156c729ab9a)
++++ b/app/src/main/java/com/example/myapplication/main/data/AppDetailsRepositoryImpl.kt	(date 1776177252178)
+@@ -4,14 +4,13 @@
+ import com.example.myapplication.main.domain.AppDetails
+ import com.example.myapplication.main.domain.AppDetailsRepository
+ 
+-
+-class AppDetailsRepositorImpl : AppDetailsRepository {
+-    private val appApi = AppDetailsApi()
+-    private val mapper = AppDetailsMapper()
++class AppDetailsRepositoryImpl(
++    private val appApi: AppDetailsApi,
++    private val mapper: AppDetailsMapper,
++) : AppDetailsRepository {
+ 
+     override suspend fun get(): AppDetails {
+         val dto = appApi.get()
+-        val domain = mapper.toDomain(dto)
+-        return domain
++        return mapper.toDomain(dto)
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication.main.presentation.appdetails\n\nimport androidx.compose.foundation.layout.*\nimport androidx.compose.material3.*\nimport androidx.compose.runtime.*\nimport androidx.compose.ui.Modifier\nimport androidx.compose.ui.res.stringResource\nimport androidx.compose.ui.unit.dp\nimport androidx.lifecycle.compose.collectAsStateWithLifecycle\nimport androidx.lifecycle.viewmodel.compose.viewModel\nimport com.example.myapplication.R\n\n@Composable\nfun AppDetailsScreen(\n    modifier: Modifier = Modifier,\n    onBackClick: () -> Unit,\n    viewModel: AppDetailsViewModel = viewModel(),\n) {\n    val state = viewModel.state.collectAsStateWithLifecycle().value\n\n    val snackbarHostState = remember { SnackbarHostState() }\n    val underDevText = stringResource(R.string.under_developement)\n\n    LaunchedEffect(viewModel) {\n        viewModel.events.collect { event ->\n            when (event) {\n                is AppDetailsEvent.ShowSnackbar -> {\n                    snackbarHostState.showSnackbar(event.message)\n                }\n            }\n        }\n    }\n    Scaffold(\n        modifier = modifier,\n        snackbarHost = { SnackbarHost(snackbarHostState) }\n    ) { padding ->\n        Column(Modifier.padding(padding)) {\n\n            Toolbar(\n                onBackClick = onBackClick,\n                onShareClick = { viewModel.onLogoClick(underDevText) },\n            )\n\n            Spacer(Modifier.height(8.dp))\n\n            val app = state.app\n            if (app == null) {\n\n                return@Column\n            }\n\n            AppDetailsHeader(\n                appDetails = app,\n                modifier = Modifier.padding(horizontal = 16.dp),\n                onLogoClick = { viewModel.onLogoClick(underDevText) }\n            )\n\n            Spacer(Modifier.height(16.dp))\n\n            InstallButton(\n                onClick = { viewModel.onLogoClick(underDevText) },\n                modifier = Modifier\n                    .fillMaxWidth()\n                    .padding(horizontal = 16.dp)\n            )\n\n            Spacer(Modifier.height(12.dp))\n\n            ScreenshotsList(\n                screenshotUrlList = app.screenshotUrlList,\n                contentPadding = PaddingValues(horizontal = 16.dp),\n            )\n\n            Spacer(Modifier.height(12.dp))\n\n            AppDescription(\n                description = app.description,\n                collapsed = state.isDescriptionExpanded,\n                onReadMoreClick = viewModel::onReadMoreClick,\n                modifier = Modifier\n                    .fillMaxWidth()\n                    .padding(horizontal = 16.dp),\n            )\n\n            Spacer(Modifier.height(12.dp))\n\n            HorizontalDivider(\n                modifier = Modifier.padding(horizontal = 16.dp),\n                color = MaterialTheme.colorScheme.outlineVariant,\n            )\n\n            Spacer(Modifier.height(12.dp))\n\n            Developer(\n                name = app.developer,\n                onClick = { viewModel.onLogoClick(underDevText) },\n                modifier = Modifier\n                    .fillMaxWidth()\n                    .padding(start = 16.dp),\n            )\n        }\n    }\n}
+===================================================================
+diff --git a/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsScreen.kt b/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsScreen.kt
+--- a/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsScreen.kt	(revision e09754006436285abb160b2bf825c156c729ab9a)
++++ b/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsScreen.kt	(date 1776176927969)
+@@ -1,9 +1,25 @@
+ package com.example.myapplication.main.presentation.appdetails
+ 
+-import androidx.compose.foundation.layout.*
+-import androidx.compose.material3.*
+-import androidx.compose.runtime.*
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.PaddingValues
++import androidx.compose.foundation.layout.Spacer
++import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.height
++import androidx.compose.foundation.layout.padding
++import androidx.compose.material3.HorizontalDivider
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.Scaffold
++import androidx.compose.material3.SnackbarHost
++import androidx.compose.material3.SnackbarHostState
++import androidx.compose.material3.Text
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.LaunchedEffect
++import androidx.compose.runtime.remember
++import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
++import androidx.compose.ui.platform.LocalContext
+ import androidx.compose.ui.res.stringResource
+ import androidx.compose.ui.unit.dp
+ import androidx.lifecycle.compose.collectAsStateWithLifecycle
+@@ -17,87 +33,95 @@
+     viewModel: AppDetailsViewModel = viewModel(),
+ ) {
+     val state = viewModel.state.collectAsStateWithLifecycle().value
+-
++    val localContext = LocalContext.current
+     val snackbarHostState = remember { SnackbarHostState() }
+-    val underDevText = stringResource(R.string.under_developement)
+ 
+-    LaunchedEffect(viewModel) {
++    LaunchedEffect(Unit) {
+         viewModel.events.collect { event ->
+             when (event) {
+                 is AppDetailsEvent.ShowSnackbar -> {
+-                    snackbarHostState.showSnackbar(event.message)
++                    snackbarHostState.showSnackbar(
++                        localContext.getString(event.messageResId)
++                    )
+                 }
+             }
+         }
+     }
++
+     Scaffold(
+         modifier = modifier,
+         snackbarHost = { SnackbarHost(snackbarHostState) }
+     ) { padding ->
+-        Column(Modifier.padding(padding)) {
+-
+-            Toolbar(
+-                onBackClick = onBackClick,
+-                onShareClick = { viewModel.onLogoClick(underDevText) },
+-            )
++        val app = state.app
++
++        if (app == null) {
++            Box(
++                modifier = Modifier
++                    .fillMaxSize()
++                    .padding(padding),
++                contentAlignment = Alignment.Center
++            ) {
++                Text(text = stringResource(R.string.no_app_details))
++            }
++        } else {
++            Column(Modifier.padding(padding)) {
++                Toolbar(
++                    onBackClick = onBackClick,
++                    onShareClick = viewModel::onLogoClick,
++                )
+ 
+-            Spacer(Modifier.height(8.dp))
++                Spacer(Modifier.height(8.dp))
+ 
+-            val app = state.app
+-            if (app == null) {
+-
+-                return@Column
+-            }
+-
+-            AppDetailsHeader(
+-                appDetails = app,
+-                modifier = Modifier.padding(horizontal = 16.dp),
+-                onLogoClick = { viewModel.onLogoClick(underDevText) }
+-            )
++                AppDetailsHeader(
++                    appDetails = app,
++                    modifier = Modifier.padding(horizontal = 16.dp),
++                    onLogoClick = viewModel::onLogoClick,
++                )
+ 
+-            Spacer(Modifier.height(16.dp))
++                Spacer(Modifier.height(16.dp))
+ 
+-            InstallButton(
+-                onClick = { viewModel.onLogoClick(underDevText) },
+-                modifier = Modifier
+-                    .fillMaxWidth()
+-                    .padding(horizontal = 16.dp)
+-            )
++                InstallButton(
++                    onClick = viewModel::onLogoClick,
++                    modifier = Modifier
++                        .fillMaxWidth()
++                        .padding(horizontal = 16.dp)
++                )
+ 
+-            Spacer(Modifier.height(12.dp))
++                Spacer(Modifier.height(12.dp))
+ 
+-            ScreenshotsList(
+-                screenshotUrlList = app.screenshotUrlList,
+-                contentPadding = PaddingValues(horizontal = 16.dp),
+-            )
++                ScreenshotsList(
++                    screenshotUrlList = app.screenshotUrlList,
++                    contentPadding = PaddingValues(horizontal = 16.dp),
++                )
+ 
+-            Spacer(Modifier.height(12.dp))
++                Spacer(Modifier.height(12.dp))
+ 
+-            AppDescription(
+-                description = app.description,
+-                collapsed = state.isDescriptionExpanded,
+-                onReadMoreClick = viewModel::onReadMoreClick,
+-                modifier = Modifier
+-                    .fillMaxWidth()
+-                    .padding(horizontal = 16.dp),
+-            )
++                AppDescription(
++                    description = app.description,
++                    collapsed = state.isDescriptionExpanded,
++                    onReadMoreClick = viewModel::onReadMoreClick,
++                    modifier = Modifier
++                        .fillMaxWidth()
++                        .padding(horizontal = 16.dp),
++                )
+ 
+-            Spacer(Modifier.height(12.dp))
++                Spacer(Modifier.height(12.dp))
+ 
+-            HorizontalDivider(
+-                modifier = Modifier.padding(horizontal = 16.dp),
+-                color = MaterialTheme.colorScheme.outlineVariant,
+-            )
++                HorizontalDivider(
++                    modifier = Modifier.padding(horizontal = 16.dp),
++                    color = MaterialTheme.colorScheme.outlineVariant,
++                )
+ 
+-            Spacer(Modifier.height(12.dp))
++                Spacer(Modifier.height(12.dp))
+ 
+-            Developer(
+-                name = app.developer,
+-                onClick = { viewModel.onLogoClick(underDevText) },
+-                modifier = Modifier
+-                    .fillMaxWidth()
+-                    .padding(start = 16.dp),
+-            )
++                Developer(
++                    name = app.developer,
++                    onClick = viewModel::onLogoClick,
++                    modifier = Modifier
++                        .fillMaxWidth()
++                        .padding(start = 16.dp),
++                )
++            }
+         }
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication.main.presentation.appdetails\n\nimport androidx.lifecycle.ViewModel\nimport com.example.myapplication.main.data.FakeAppDetailsData\nimport kotlinx.coroutines.channels.Channel\nimport kotlinx.coroutines.flow.MutableStateFlow\nimport kotlinx.coroutines.flow.StateFlow\nimport kotlinx.coroutines.flow.receiveAsFlow\nimport kotlinx.coroutines.flow.update\n\nclass AppDetailsViewModel : ViewModel() {\n\n    private val _state = MutableStateFlow(AppDetailsState())\n    val state: StateFlow<AppDetailsState> = _state\n\n    private val _events = Channel<AppDetailsEvent>(Channel.BUFFERED)\n    val events = _events.receiveAsFlow()\n\n    init {\n        val app = FakeAppDetailsData.getAppDetails(id = \"sber_online\")\n        _state.update { it.copy(isLoading = false, app = app) }\n    }\n\n    fun onReadMoreClick() {\n        _state.update { it.copy(isDescriptionExpanded = true) }\n    }\n\n    fun onLogoClick(message: String) {\n        _events.trySend(AppDetailsEvent.ShowSnackbar(message))\n    }\n}
+===================================================================
+diff --git a/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsViewModel.kt b/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsViewModel.kt
+--- a/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsViewModel.kt	(revision e09754006436285abb160b2bf825c156c729ab9a)
++++ b/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsViewModel.kt	(date 1776177623528)
+@@ -1,31 +1,51 @@
+ package com.example.myapplication.main.presentation.appdetails
+ 
++import AppDetailsMapper
+ import androidx.lifecycle.ViewModel
+-import com.example.myapplication.main.data.FakeAppDetailsData
++import androidx.lifecycle.viewModelScope
++import com.example.myapplication.R
++import com.example.myapplication.main.data.AppDetailsApi
++import com.example.myapplication.main.data.AppDetailsRepositoryImpl
++import com.example.myapplication.main.domain.GetAppDetailsUseCase
+ import kotlinx.coroutines.channels.Channel
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.StateFlow
+ import kotlinx.coroutines.flow.receiveAsFlow
+ import kotlinx.coroutines.flow.update
++import kotlinx.coroutines.launch
+ 
+ class AppDetailsViewModel : ViewModel() {
+ 
+     private val _state = MutableStateFlow(AppDetailsState())
+     val state: StateFlow<AppDetailsState> = _state
+ 
++    private val useCase = GetAppDetailsUseCase(
++        appDetailsRepository = AppDetailsRepositoryImpl(
++            appApi = AppDetailsApi(),
++            mapper = AppDetailsMapper(),
++        )
++    )
++
+     private val _events = Channel<AppDetailsEvent>(Channel.BUFFERED)
+     val events = _events.receiveAsFlow()
+ 
+     init {
+-        val app = FakeAppDetailsData.getAppDetails(id = "sber_online")
+-        _state.update { it.copy(isLoading = false, app = app) }
++        viewModelScope.launch {
++            try {
++                val app = useCase()
++                _state.update { it.copy(isLoading = false, app = app) }
++            } catch (e: Exception) {
++                _state.update { it.copy(isLoading = false, app = null) }
++                _events.trySend(AppDetailsEvent.ShowSnackbar(R.string.load_error))
++            }
++        }
+     }
+ 
+     fun onReadMoreClick() {
+         _state.update { it.copy(isDescriptionExpanded = true) }
+     }
+ 
+-    fun onLogoClick(message: String) {
+-        _events.trySend(AppDetailsEvent.ShowSnackbar(message))
++    fun onLogoClick() {
++        _events.trySend(AppDetailsEvent.ShowSnackbar(R.string.under_developement))
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/myapplication/main/presentation/applist/AppListViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication.main.presentation.applist\n\nimport androidx.lifecycle.ViewModel\nimport androidx.lifecycle.viewModelScope\nimport com.example.myapplication.main.data.AppItemDtoMapper\nimport com.example.myapplication.main.data.AppsListApi\nimport com.example.myapplication.main.data.AppsRepositoryImpl\nimport com.example.myapplication.main.domain.GetAppsUseCase\nimport kotlinx.coroutines.channels.Channel\nimport kotlinx.coroutines.flow.MutableStateFlow\nimport kotlinx.coroutines.flow.StateFlow\nimport kotlinx.coroutines.flow.receiveAsFlow\nimport kotlinx.coroutines.flow.update\nimport kotlinx.coroutines.launch\n\nclass AppsListViewModel : ViewModel() {\n\n    private val _state = MutableStateFlow(AppsListState())\n    val state: StateFlow<AppsListState> = _state\n    private val useCase = GetAppsUseCase(\n        repository = AppsRepositoryImpl(\n            api = AppsListApi(),\n            mapper = AppItemDtoMapper()\n        )\n    )\n    private val _events = Channel<AppsListEvent>(Channel.BUFFERED)\n    val events = _events.receiveAsFlow()\n\n    init {\n        viewModelScope.launch {\n            val items = useCase()\n            _state.update { it.copy(items = items, isLoading = false) }\n        }\n    }\n\n    fun onLogoClick(message: String) {\n        _events.trySend(AppsListEvent.ShowSnackbar(message))\n    }\n}
+===================================================================
+diff --git a/app/src/main/java/com/example/myapplication/main/presentation/applist/AppListViewModel.kt b/app/src/main/java/com/example/myapplication/main/presentation/applist/AppListViewModel.kt
+--- a/app/src/main/java/com/example/myapplication/main/presentation/applist/AppListViewModel.kt	(revision e09754006436285abb160b2bf825c156c729ab9a)
++++ b/app/src/main/java/com/example/myapplication/main/presentation/applist/AppListViewModel.kt	(date 1776177099109)
+@@ -2,6 +2,7 @@
+ 
+ import androidx.lifecycle.ViewModel
+ import androidx.lifecycle.viewModelScope
++import com.example.myapplication.R
+ import com.example.myapplication.main.data.AppItemDtoMapper
+ import com.example.myapplication.main.data.AppsListApi
+ import com.example.myapplication.main.data.AppsRepositoryImpl
+@@ -17,23 +18,25 @@
+ 
+     private val _state = MutableStateFlow(AppsListState())
+     val state: StateFlow<AppsListState> = _state
+-    private val useCase = GetAppsUseCase(
++
++    private val getAppsUseCase = GetAppsUseCase(
+         repository = AppsRepositoryImpl(
+             api = AppsListApi(),
+             mapper = AppItemDtoMapper()
+         )
+     )
++
+     private val _events = Channel<AppsListEvent>(Channel.BUFFERED)
+     val events = _events.receiveAsFlow()
+ 
+     init {
+         viewModelScope.launch {
+-            val items = useCase()
++            val items = getAppsUseCase()
+             _state.update { it.copy(items = items, isLoading = false) }
+         }
+     }
+ 
+-    fun onLogoClick(message: String) {
+-        _events.trySend(AppsListEvent.ShowSnackbar(message))
++    fun onLogoClick() {
++        _events.trySend(AppsListEvent.ShowSnackbar(R.string.app_name))
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsEvent.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication.main.presentation.appdetails\n\nsealed interface AppDetailsEvent {\n    data class ShowSnackbar(val message: String) : AppDetailsEvent\n}
+===================================================================
+diff --git a/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsEvent.kt b/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsEvent.kt
+--- a/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsEvent.kt	(revision e09754006436285abb160b2bf825c156c729ab9a)
++++ b/app/src/main/java/com/example/myapplication/main/presentation/appdetails/AppDetailsEvent.kt	(date 1776176972784)
+@@ -1,5 +1,7 @@
+ package com.example.myapplication.main.presentation.appdetails
+ 
++import androidx.annotation.StringRes
++
+ sealed interface AppDetailsEvent {
+-    data class ShowSnackbar(val message: String) : AppDetailsEvent
++    data class ShowSnackbar(@StringRes val messageResId: Int) : AppDetailsEvent
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/myapplication/main/presentation/applist/AppsListScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication.main.presentation.applist\n\nimport androidx.compose.foundation.background\nimport androidx.compose.foundation.clickable\nimport androidx.compose.foundation.layout.Box\nimport androidx.compose.foundation.layout.Column\nimport androidx.compose.foundation.layout.fillMaxWidth\nimport androidx.compose.foundation.layout.height\nimport androidx.compose.foundation.layout.padding\nimport androidx.compose.material3.MaterialTheme\nimport androidx.compose.material3.Scaffold\nimport androidx.compose.material3.SnackbarHost\nimport androidx.compose.material3.SnackbarHostState\nimport androidx.compose.material3.Text\nimport androidx.compose.runtime.Composable\nimport androidx.compose.runtime.LaunchedEffect\nimport androidx.compose.runtime.remember\nimport androidx.compose.ui.Alignment\nimport androidx.compose.ui.Modifier\nimport androidx.compose.ui.graphics.Color\nimport androidx.compose.ui.res.stringResource\nimport androidx.compose.ui.unit.dp\nimport androidx.lifecycle.compose.collectAsStateWithLifecycle\nimport androidx.lifecycle.viewmodel.compose.viewModel\nimport com.example.myapplication.R\nimport com.example.myapplication.main.domain.AppItem\n\n@Composable\nfun AppsListScreen(\n    onItemClick: (AppItem) -> Unit,\n    modifier: Modifier = Modifier,\n    viewModel: AppsListViewModel = viewModel(),\n) {\n    val state = viewModel.state.collectAsStateWithLifecycle().value\n\n    val snackbarHostState = remember { SnackbarHostState() }\n    val logoClickText = stringResource(R.string.app_name)\n\n    LaunchedEffect(viewModel) {\n        viewModel.events.collect { event ->\n            when (event) {\n                is AppsListEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)\n            }\n        }\n    }\n\n    Scaffold(\n        modifier = modifier,\n        snackbarHost = { SnackbarHost(snackbarHostState) }\n    ) { padding ->\n        Column(Modifier.padding(padding)) {\n            Box(\n                modifier = Modifier\n                    .fillMaxWidth()\n                    .height(64.dp)\n                    .background(Color(0xFF3F6DF6))\n                    .clickable { viewModel.onLogoClick(logoClickText) }\n                    .padding(horizontal = 16.dp),\n                contentAlignment = Alignment.CenterStart\n            ) {\n                Text(\n                    text = \"RuStore\",\n                    style = MaterialTheme.typography.titleLarge,\n                    color = Color.White\n                )\n            }\n\n            AppsLazyList(\n                itemsList = state.items,\n                onItemClick = onItemClick\n            )\n        }\n    }\n}
+===================================================================
+diff --git a/app/src/main/java/com/example/myapplication/main/presentation/applist/AppsListScreen.kt b/app/src/main/java/com/example/myapplication/main/presentation/applist/AppsListScreen.kt
+--- a/app/src/main/java/com/example/myapplication/main/presentation/applist/AppsListScreen.kt	(revision e09754006436285abb160b2bf825c156c729ab9a)
++++ b/app/src/main/java/com/example/myapplication/main/presentation/applist/AppsListScreen.kt	(date 1776176020510)
+@@ -18,12 +18,13 @@
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.graphics.Color
+-import androidx.compose.ui.res.stringResource
++import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.tooling.preview.Preview
+ import androidx.compose.ui.unit.dp
+ import androidx.lifecycle.compose.collectAsStateWithLifecycle
+ import androidx.lifecycle.viewmodel.compose.viewModel
+-import com.example.myapplication.R
+ import com.example.myapplication.main.domain.AppItem
++import com.example.myapplication.ui.theme.MyApplicationTheme
+ 
+ @Composable
+ fun AppsListScreen(
+@@ -32,14 +33,18 @@
+     viewModel: AppsListViewModel = viewModel(),
+ ) {
+     val state = viewModel.state.collectAsStateWithLifecycle().value
++    val localContext = LocalContext.current
+ 
+     val snackbarHostState = remember { SnackbarHostState() }
+-    val logoClickText = stringResource(R.string.app_name)
+ 
+-    LaunchedEffect(viewModel) {
++    LaunchedEffect(Unit) {
+         viewModel.events.collect { event ->
+             when (event) {
+-                is AppsListEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
++                is AppsListEvent.ShowSnackbar -> {
++                    snackbarHostState.showSnackbar(
++                        localContext.getString(event.messageResId)
++                    )
++                }
+             }
+         }
+     }
+@@ -54,7 +59,7 @@
+                     .fillMaxWidth()
+                     .height(64.dp)
+                     .background(Color(0xFF3F6DF6))
+-                    .clickable { viewModel.onLogoClick(logoClickText) }
++                    .clickable { viewModel.onLogoClick() }
+                     .padding(horizontal = 16.dp),
+                 contentAlignment = Alignment.CenterStart
+             ) {
+@@ -71,4 +76,14 @@
+             )
+         }
+     }
++}
++
++@Preview(showBackground = true)
++@Composable
++fun PreviewAppsListScreen() {
++    MyApplicationTheme {
++        AppsListScreen(
++            onItemClick = {}
++        )
++    }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/myapplication/main/presentation/applist/AppListEvent.kt
+===================================================================
+diff --git a/app/src/main/java/com/example/myapplication/main/presentation/applist/AppListEvent.kt b/app/src/main/java/com/example/myapplication/main/presentation/applist/AppsListEvent.kt
+rename from app/src/main/java/com/example/myapplication/main/presentation/applist/AppListEvent.kt
+rename to app/src/main/java/com/example/myapplication/main/presentation/applist/AppsListEvent.kt
+--- a/app/src/main/java/com/example/myapplication/main/presentation/applist/AppListEvent.kt	(revision e09754006436285abb160b2bf825c156c729ab9a)
++++ b/app/src/main/java/com/example/myapplication/main/presentation/applist/AppsListEvent.kt	(date 1776175489639)
+@@ -1,5 +1,7 @@
+ package com.example.myapplication.main.presentation.applist
+ 
++import androidx.annotation.StringRes
++
+ sealed interface AppsListEvent {
+-    data class ShowSnackbar(val message: String) : AppsListEvent
++    data class ShowSnackbar(@StringRes val messageResId: Int) : AppsListEvent
+ }
+\ No newline at end of file

@@ -26,15 +26,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewAppsListScreen() {
-    MyApplicationTheme {
-        AppsListScreen(
-            onItemClick = {}
-        )
-    }
-}
